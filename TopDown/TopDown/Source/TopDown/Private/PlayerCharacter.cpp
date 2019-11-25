@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components\InputComponent.h"
+#include "C:\Program Files\Epic Games\UE_4.23\Engine\Source\Runtime\Core\Public\Math\Vector.h"
 
 
 // Sets default values
@@ -49,13 +50,20 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::MoveUp(float Value)
 {
 
-	AddMovementInput(TopDownCameraComponent->GetUpVector() * Value);
+	FVector isoProj = FVector::VectorPlaneProject(TopDownCameraComponent->GetUpVector(),  FVector::UpVector);
+	
+	isoProj.Normalize();
+
+	AddMovementInput(isoProj, Value);
 }
 
 void APlayerCharacter::MoveRight(float Value)
 {
+	FVector isoProj = FVector::VectorPlaneProject(TopDownCameraComponent->GetRightVector(), FVector::UpVector);
 
-	AddMovementInput(TopDownCameraComponent->GetRightVector() * Value);
+	isoProj.Normalize();
+
+	AddMovementInput( isoProj, Value);
 }
 
 
@@ -64,7 +72,7 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveUp);
+	PlayerInputComponent->BindAxis("MoveUp", this, &APlayerCharacter::MoveUp);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
 }
 
